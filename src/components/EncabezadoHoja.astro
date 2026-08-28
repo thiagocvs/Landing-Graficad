@@ -1,0 +1,22 @@
+---
+interface Props {
+  n: string;
+  rotulo: string;
+  titulo: string;
+  bajada?: string;
+}
+const { n, rotulo, titulo, bajada } = Astro.props;
+---
+
+<!-- Cajetín de la hoja: numeración a la izquierda, título alineado. -->
+<div class="grid gap-x-8 gap-y-4 md:grid-cols-[5rem_minmax(0,1fr)]" data-reveal>
+  <p class="type-label flex items-baseline gap-3 text-ink-500 md:flex-col md:gap-1">
+    <span class="text-signal tabular-nums">{n}</span>
+    <span>{rotulo}</span>
+  </p>
+
+  <div>
+    <h2 class="type-display max-w-[18ch] text-2xl">{titulo}</h2>
+    {bajada && <p class="measure mt-5 text-ink-600">{bajada}</p>}
+  </div>
+</div>

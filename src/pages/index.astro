@@ -1,0 +1,27 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Enfoque from '../components/Enfoque.astro';
+import Servicios from '../components/Servicios.astro';
+import Taller from '../components/Taller.astro';
+import Obra from '../components/Obra.astro';
+import Cotizacion from '../components/Cotizacion.astro';
+import Pie from '../components/Pie.astro';
+---
+
+<Base
+  titulo="Graficad SA · Gigantografías e impresión de gran formato"
+  descripcion="Vallas, lonas de fachada, señalética y rotulación de flotas. Impresión de gran formato con montaje propio. Cotización en menos de 24 h hábiles."
+>
+  <Header />
+  <main id="contenido">
+    <Hero />
+    <Enfoque />
+    <Servicios />
+    <Taller />
+    <Obra />
+    <Cotizacion />
+  </main>
+  <Pie />
+</Base>

@@ -1,0 +1,143 @@
+---
+import { hojas } from '../data/site';
+import Marca from './Marca.astro';
+
+// La numeración de hoja del plóter es la navegación: 01/07 … 07/07.
+const total = String(hojas.length).padStart(2, '0');
+---
+
+<header
+  id="cabecera"
+  class="fixed inset-x-0 top-0 z-40 border-b border-transparent transition-[background-color,border-color] duration-300 ease-out data-[fijo]:border-ink-200 data-[fijo]:bg-ink-000/85 data-[fijo]:backdrop-blur-md"
+>
+  <div class="mx-auto flex max-w-[88rem] items-center gap-3 px-5 py-3 md:gap-6 md:px-10 md:py-4">
+    <a href="#inicio" class="flex min-h-11 shrink-0 items-center">
+      <Marca tamano="text-[1.05rem] sm:text-[1.35rem]" />
+    </a>
+
+    <!-- Contador de hoja: refleja en qué sección está el lector. -->
+    <p class="type-label ml-auto hidden items-baseline gap-1.5 text-ink-500 md:flex" aria-hidden="true">
+      <span>Hoja</span>
+      <span id="hoja-actual" class="text-signal tabular-nums">01</span>
+      <span>/ {total}</span>
+    </p>
+
+    <nav aria-label="Secciones" class="hidden lg:block">
+      <ul class="flex items-center gap-7">
+        {
+          hojas.slice(1, -1).map((h) => (
+            <li>
+              <a
+                href={`#${h.id}`}
+                data-enlace={h.id}
+                class="type-label relative py-1 text-ink-600 transition-colors duration-200 hover:text-ink-800 aria-[current=true]:text-ink-800 aria-[current=true]:after:absolute aria-[current=true]:after:inset-x-0 aria-[current=true]:after:-bottom-0.5 aria-[current=true]:after:h-px aria-[current=true]:after:bg-signal"
+              >
+                {h.titulo}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <a
+      href="#cotizacion"
+      class="type-label ml-auto inline-flex min-h-11 shrink-0 items-center bg-signal px-3.5 text-signal-ink sm:px-5 transition-colors duration-200 hover:bg-signal-lit md:ml-0"
+    >
+      Cotizar
+    </a>
+
+    <button
+      id="abrir-menu"
+      type="button"
+      class="grid size-11 shrink-0 place-items-center text-ink-700 lg:hidden"
+      aria-expanded="false"
+      aria-controls="menu-movil"
+    >
+      <span class="sr-only">Abrir menú de secciones</span>
+      <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
+        <path d="M3 7h18M3 12h18M3 17h18" />
+      </svg>
+    </button>
+  </div>
+
+  <!-- Menú móvil: lista completa de hojas, con su número. No se amputa nada. -->
+  <nav
+    id="menu-movil"
+    hidden
+    aria-label="Secciones"
+    class="border-t border-ink-200 bg-ink-050 lg:hidden"
+  >
+    <ul class="mx-auto max-w-[88rem] px-5 py-2 md:px-10">
+      {
+        hojas.map((h) => (
+          <li class="border-b border-ink-100 last:border-0">
+            <a href={`#${h.id}`} class="flex items-baseline gap-4 py-4">
+              <span class="type-label text-ink-500 tabular-nums">{h.n}</span>
+              <span class="type-display text-lg">{h.titulo}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const cabecera = document.getElementById('cabecera')!;
+  const boton = document.getElementById('abrir-menu')!;
+  const menu = document.getElementById('menu-movil')!;
+  const contador = document.getElementById('hoja-actual');
+  const enlaces = document.querySelectorAll<HTMLAnchorElement>('[data-enlace]');
+
+  // --- Estado fijo del header --------------------------------------------
+  const alScrollear = () => {
+    cabecera.toggleAttribute('data-fijo', window.scrollY > 24);
+  };
+  alScrollear();
+  window.addEventListener('scroll', alScrollear, { passive: true });
+
+  // --- Menú móvil ---------------------------------------------------------
+  const cerrarMenu = () => {
+    menu.hidden = true;
+    boton.setAttribute('aria-expanded', 'false');
+    boton.querySelector('span')!.textContent = 'Abrir menú de secciones';
+  };
+
+  boton.addEventListener('click', () => {
+    const abierto = menu.hidden;
+    menu.hidden = !abierto;
+    boton.setAttribute('aria-expanded', String(abierto));
+    boton.querySelector('span')!.textContent = abierto
+      ? 'Cerrar menú de secciones'
+      : 'Abrir menú de secciones';
+  });
+
+  menu.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) cerrarMenu();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.hidden) {
+      cerrarMenu();
+      boton.focus();
+    }
+  });
+
+  // --- Sección activa: alimenta el contador de hoja y el nav --------------
+  const secciones = document.querySelectorAll<HTMLElement>('[data-hoja]');
+  const observer = new IntersectionObserver(
+    (entradas) => {
+      for (const entrada of entradas) {
+        if (!entrada.isIntersecting) continue;
+        const seccion = entrada.target as HTMLElement;
+        if (contador) contador.textContent = seccion.dataset.hoja ?? '01';
+        enlaces.forEach((a) =>
+          a.setAttribute('aria-current', String(a.dataset.enlace === seccion.id)),
+        );
+      }
+    },
+    { rootMargin: '-45% 0px -55% 0px' },
+  );
+  secciones.forEach((s) => observer.observe(s));
+</script>

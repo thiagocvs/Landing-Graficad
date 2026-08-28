@@ -1,0 +1,70 @@
+---
+import { empresa } from '../data/site';
+
+interface Props {
+  class?: string;
+  /** Tamaño del logotipo. El isotipo y la bajada escalan con él. */
+  tamano?: string;
+  /** Muestra "Arquitectura Publicitaria" bajo el logotipo. */
+  bajada?: boolean;
+}
+const { class: clase, tamano = 'text-[1.4rem]', bajada = false } = Astro.props;
+---
+
+{/*
+  El logotipo real tiene biseles 3D que el CSS no debería imitar: si ponés el
+  archivo en public/ y lo declarás en `empresa.logo` (src/data/site.ts), este
+  componente usa la imagen y descarta la reconstrucción tipográfica de abajo.
+*/}
+<span class={`inline-flex flex-col ${clase ?? ''}`}>
+  {
+    empresa.logo ? (
+      /* Dos archivos, un criterio: en el pie hay tamaño para leer la bajada y se
+         usa el lockup completo; en el header, a 36 px de alto, la bajada sería
+         una mancha, así que va solo el logotipo. width/height reales evitan CLS. */
+      <img
+        src={bajada ? empresa.logo : empresa.logoMarca}
+        alt={`${empresa.nombre} — ${empresa.lema}`}
+        width={bajada ? empresa.logoAncho : empresa.logoMarcaAncho}
+        height={bajada ? empresa.logoAlto : empresa.logoMarcaAlto}
+        decoding="async"
+        class={`w-auto ${bajada ? 'h-16 sm:h-[4.5rem]' : 'h-7 sm:h-9'}`}
+      />
+    ) : (
+      <>
+        <span class={`flex items-center gap-1 whitespace-nowrap text-signal ${tamano}`}>
+          {/* "Grafi": peso ligero y ancho normal, como en el logotipo. */}
+          <span style="font-stretch:100%;font-weight:600;letter-spacing:-.02em">Grafi</span>
+
+          {/* "C" + dardo + "D": el bloque pesado y expandido. */}
+          <span
+            class="flex items-baseline"
+            style="font-stretch:120%;font-weight:800;letter-spacing:-.045em"
+          >
+            C
+            {/* El dardo que reemplaza a la A en el logotipo. */}
+            <svg
+              viewBox="0 0 36 30"
+              class="-mx-[0.02em] h-[1em] w-auto self-center"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path d="M27.4 0 19.8 13.4 36 10.6 8.9 30l7.6-14.2L0 18.7Z" />
+            </svg>
+            D
+          </span>
+        </span>
+
+        {bajada && (
+          <span
+            class="mt-0.5 text-signal/85"
+            style="font-size:.36em;font-weight:600;letter-spacing:.01em"
+          >
+            {empresa.lema}
+          </span>
+        )}
+      </>
+    )
+  }
+</span>
+<span class="sr-only">{empresa.nombre} — {empresa.lema}</span>

@@ -1,0 +1,47 @@
+---
+import { enfoque } from '../data/site';
+import EncabezadoHoja from './EncabezadoHoja.astro';
+---
+
+<section id="enfoque" data-hoja="02" class="textura border-t border-ink-100" style="--textura:.32">
+  <div class="mx-auto max-w-[88rem] px-5 md:px-10" style="padding-block: var(--aire-seccion)">
+    <EncabezadoHoja
+      n="02"
+      rotulo="Enfoque"
+      titulo="De invisible a inevitable"
+      bajada="Tres pasos separan a una marca que se pierde en el ruido de una que se ve desde el otro lado de la avenida."
+    />
+
+    <ol class="escalonado mt-20 grid gap-14 lg:grid-cols-[repeat(3,minmax(0,1fr))] lg:gap-10">
+      {
+        enfoque.map((paso, i) => (
+          <li
+            class="border-t border-ink-200 pt-6"
+            style={`--paso:${i}; --reveal-delay:${i * 110}ms`}
+            data-reveal
+          >
+            {/* El número va en el flujo, no flotando en absolute: así no puede
+                montarse sobre el título cuando la columna se angosta. Además
+                queda igual que la numeración de las hojas 03 y 04. */}
+            <p class="type-label flex items-center gap-3 text-signal tabular-nums">
+              <span class="h-3.5 w-0.5 shrink-0 bg-signal" aria-hidden="true"></span>
+              Paso {paso.n}
+            </p>
+            <h3 class="type-heading mt-4 text-xl">{paso.titulo}</h3>
+            <p class="measure-tight mt-4 text-ink-600">{paso.texto}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  /* Escalonado en diagonal: el ojo desciende en lugar de leer tres cajas iguales.
+     Solo con tres columnas — apilado no tendría sentido. */
+  @media (min-width: 48rem) {
+    .escalonado > li {
+      margin-top: calc(var(--paso) * 2.5rem);
+    }
+  }
+</style>

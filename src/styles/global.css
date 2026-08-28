@@ -1,0 +1,414 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   GRAFICAD — Tokens
+   Paleta leída del logotipo: oro sobre azul marino profundo, con destellos de
+   azul eléctrico. El oro es el sujeto; el azul, el ambiente. Ver .impeccable.md
+   Todo el color en OKLCH. Neutros teñidos hacia el matiz 255 del navy del logo:
+   el gris puro y el negro puro no existen en este sistema.
+   ============================================================================ */
+@theme {
+  /* --- Superficies e "ink" (neutros teñidos) ------------------------------ */
+  --color-ink-000: oklch(15.0% 0.020 255); /* fondo profundo    ~#060C13 */
+  --color-ink-050: oklch(20.0% 0.034 255); /* navy del logo     ~#0B1725 */
+  --color-ink-100: oklch(24.5% 0.046 254); /* faceta media      ~#102136 */
+  --color-ink-200: oklch(31.0% 0.052 254); /* superficie activa ~#1D314A */
+  --color-ink-300: oklch(38.0% 0.050 252); /* borde marcado     ~#2E445C */
+  --color-ink-400: oklch(47.0% 0.045 250); /* borde / decorativo — NO texto */
+  --color-ink-500: oklch(63.0% 0.035 246); /* texto terciario   5.65:1  */
+  --color-ink-600: oklch(77.0% 0.028 238); /* texto secundario  9.54:1  */
+  --color-ink-700: oklch(88.5% 0.020 230); /* texto cuerpo     13.98:1  */
+  --color-ink-800: oklch(97.0% 0.010 220); /* titulares        18.08:1  */
+
+  /* --- Oro: el color de la marca, tomado del logotipo ----------------------
+     Es el sujeto de la identidad. Llama a la acción: CTA, foco, sección activa. */
+  --color-signal:     oklch(79.0% 0.155 74); /* ~#F5A92D — 9.94:1 sobre el fondo */
+  --color-signal-lit: oklch(88.0% 0.135 82); /* bisel alto del logo */
+  --color-signal-dim: oklch(64.0% 0.140 66); /* bisel bajo del logo */
+  --color-signal-ink: oklch(15.0% 0.020 255); /* texto sobre oro — 9.94:1 */
+
+  /* --- Destello: el azul eléctrico del fondo del logo ----------------------
+     Es ambiente, no sujeto: vive en la textura y en los indicadores de estado.
+     A 4.93:1 el tono puro no alcanza para texto corrido, así que cuando lleva
+     texto se usa --color-beam-lit (8.45:1). Nunca compite con el oro. */
+  --color-beam: oklch(60.6% 0.216 258); /* ~#007BFE — solo destello y borde */
+  --color-beam-lit: oklch(74.0% 0.145 250); /* ~#68ADFF — el que puede llevar texto */
+
+  /* --- Semánticos --------------------------------------------------------- */
+  --color-alert: oklch(70.0% 0.170 25);
+  --color-valid: oklch(78.0% 0.150 155);
+
+  /* --- Tipografía: una familia, tres anchos ------------------------------- */
+  --font-sans: "Archivo", "Archivo Fallback", system-ui, sans-serif;
+  /* Mono real para cotas, coordenadas y estado: son datos de máquina, y el
+     ancho fijo alinea las cifras en columna. No es decoración "tecnológica". */
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", monospace;
+
+  /* Escala modular, ratio 1.333 (cuarta justa). Fluida solo en display. */
+  /* La altura de línea baja al subir el tamaño: los titulares no necesitan aire
+     entre líneas, el texto claro sobre oscuro sí. */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1.4;
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.6;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.7;
+  --text-lg: 1.375rem;
+  --text-lg--line-height: 1.5;
+  --text-xl: clamp(1.5rem, 1.05rem + 1.1vw, 2rem);
+  --text-xl--line-height: 1.06;
+  --text-2xl: clamp(2.25rem, 1.5rem + 3.6vw, 5rem);
+  --text-2xl--line-height: 1.0;
+  --text-3xl: clamp(2.75rem, 1rem + 6.8vw, 7rem);
+  --text-3xl--line-height: 0.92;
+
+  --tracking-label: 0.18em;
+
+  /* --- Movimiento ---------------------------------------------------------
+     Tokens tomados de la skill motion-foundations y llevados a CSS: el
+     proyecto es Astro sin framework, y sumar React solo para animar
+     contradice la regla de no agregar dependencias por un adorno visual.
+     Las restricciones sí se respetan enteras: solo transform y opacity,
+     nada de propiedades de layout, y reduced-motion manda sobre todo. */
+  --dur-instant: 80ms;
+  --dur-fast: 180ms;
+  --dur-normal: 350ms;
+  --dur-slow: 600ms;
+  --dur-crawl: 1000ms;
+
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-sharp: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --dist-sm: 8px;
+  --dist-md: 16px;
+  --dist-lg: 24px;
+  --dist-xl: 48px;
+
+  /* Nombres viejos, conservados para no romper lo ya escrito. */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* --- Ritmo vertical: el aire es la mitad del trabajo -------------------- */
+  --aire-seccion: clamp(6rem, 12vw, 11rem);
+  --aire-bloque: clamp(3rem, 6vw, 6rem);
+}
+
+/* Métricas de fallback para que el swap de Archivo no mueva el layout (CLS). */
+@font-face {
+  font-family: "Archivo Fallback";
+  src: local("Arial");
+  size-adjust: 101%;
+  ascent-override: 92%;
+  descent-override: 24%;
+  line-gap-override: 0%;
+}
+
+/* ============================================================================
+   Base
+   ============================================================================ */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-ink-000);
+    color: var(--color-ink-700);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    /* Texto claro sobre oscuro se lee más liviano: +0.1 de interlineado. */
+    line-height: 1.7;
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 {
+    color: var(--color-ink-800);
+    line-height: 1.02;
+    text-wrap: balance;
+  }
+
+  p { text-wrap: pretty; }
+
+  ::selection {
+    background-color: var(--color-signal);
+    color: var(--color-signal-ink);
+  }
+
+  /* El placeholder también necesita 4.5:1 — ink-500 lo cumple (5.46:1). */
+  ::placeholder { color: var(--color-ink-500); opacity: 1; }
+}
+
+/* ============================================================================
+   Utilidades del sistema
+   ============================================================================ */
+@layer components {
+  /* --- Los anchos de Archivo ----------------------------------------------
+     Regla: el eje de ancho sigue al ancho del contenedor. Un titular que
+     ocupa la hoja entera se estira; uno encerrado en una columna angosta no.
+     Estirar dentro de una columna no se lee como intención: se lee como error. */
+
+  /* Display: expandido. Solo para titulares a todo el ancho de la hoja. */
+  .type-display {
+    font-stretch: 125%;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 0.94;
+    text-transform: uppercase;
+    /* Un titular NUNCA parte una palabra. `overflow-wrap: break-word` estaba
+       acá como red de seguridad contra solapamientos, pero produjo cortes como
+       "GIGANTOGRAFÍ / AS" y "GRAFIC / AD": el remedio salió peor. La regla real
+       es que el contenedor tiene que dar para la palabra más larga, y eso se
+       comprueba en `npm run inspeccionar`. */
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    hyphens: manual;
+  }
+
+  /* Heading: ancho normal, para h3 dentro de columnas y filas. */
+  .type-heading {
+    font-stretch: 100%;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    text-transform: uppercase;
+    /* Mismo criterio que en display: no se parten palabras. */
+    min-width: 0;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    hyphens: manual;
+  }
+  /* Etiqueta: monoespaciada, para cotas, numeración de hoja y metadatos. */
+  .type-label {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: var(--text-2xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Chip de especificación: el dato encajonado del pliego. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--color-ink-300);
+    background-color: color-mix(in oklab, var(--color-ink-000) 55%, transparent);
+    font-family: var(--font-mono);
+    font-size: var(--text-2xs);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-600);
+    white-space: nowrap;
+  }
+  .chip--vivo {
+    border-color: color-mix(in oklab, var(--color-beam) 55%, transparent);
+    color: var(--color-beam-lit);
+  }
+
+  /* Flecha del <select>. Va en CSS y no en una clase de Tailwind: el data-URI
+     lleva espacios, y dentro de un atributo class el navegador los toma como
+     separador y parte la clase en pedazos. Así nunca se dibujaba. */
+  .select-flecha {
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='%23F5A92D'%20stroke-width='2'%20stroke-linecap='round'%3E%3Cpath%20d='M6%209l6%206%206-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 18px 18px;
+    padding-right: 3rem;
+  }
+
+  /* ==========================================================================
+     TEXTURA DE MARCA — el fondo del logotipo, reconstruido en CSS
+     Cuatro capas sobre el navy: facetas angulares a 114°, un destello azul
+     con su halo, y una trama fina de 4px. Cero imágenes: escala a cualquier
+     tamaño, cambia con los tokens y no pesa un byte de red.
+     Intensidad por elemento con --textura (0 la apaga, 1 es el hero).
+     ========================================================================== */
+  .textura {
+    position: relative;
+    isolation: isolate;
+    background-color: var(--color-ink-000);
+  }
+  .textura::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--textura, 1);
+    background-image:
+      /* 1 · trama fina, como la fibra del fondo del logo */
+      radial-gradient(circle at 1px 1px, oklch(100% 0 0 / 0.04) 1px, transparent 0),
+      /* 2 · destello azul: la línea brillante que corta la diagonal */
+      repeating-linear-gradient(
+        114deg,
+        transparent 0 232px,
+        color-mix(in oklab, var(--color-beam) 70%, transparent) 232px 234px,
+        transparent 234px 268px,
+        color-mix(in oklab, var(--color-beam) 30%, transparent) 268px 269px,
+        transparent 269px 760px
+      ),
+      /* 3 · halo del destello, ancho y tenue */
+      repeating-linear-gradient(
+        114deg,
+        transparent 0 196px,
+        color-mix(in oklab, var(--color-beam) 12%, transparent) 214px 252px,
+        transparent 276px 760px
+      ),
+      /* 4 · facetas angulares del fondo */
+      repeating-linear-gradient(
+        114deg,
+        var(--color-ink-050) 0 96px,
+        var(--color-ink-000) 96px 208px,
+        var(--color-ink-100) 208px 262px,
+        var(--color-ink-000) 262px 452px
+      );
+    background-size:
+      4px 4px,
+      auto,
+      auto,
+      auto;
+  }
+
+  /* El contenido va por encima de la textura sin crear otro contexto. */
+  .textura > * {
+    position: relative;
+  }
+  .type-body { font-stretch: 100%; }
+
+  /* --- Medida de lectura -------------------------------------------------- */
+  .measure { max-width: 68ch; }
+  .measure-tight { max-width: 46ch; }
+
+  /* --- Cota acotada: el motivo recurrente --------------------------------
+     Una línea con topes en los extremos, como una cota de dibujo técnico.
+     Se usa donde hay una medida real que comunicar, nunca como adorno.      */
+  .dimension {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--color-ink-500);
+  }
+  .dimension::before,
+  .dimension::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background-color: currentColor;
+    /* Los topes verticales en cada extremo de la línea de cota. */
+    box-shadow: 0 -3px 0 -1px currentColor, 0 3px 0 -1px currentColor;
+  }
+  .dimension--start::before { display: none; }
+  .dimension--start::after { flex: 0 0 4rem; }
+}
+
+/* ============================================================================
+   Revelado al hacer scroll — solo transform y opacity.
+   ============================================================================ */
+@layer utilities {
+  /* --- Revelado al entrar en pantalla --------------------------------------
+     Solo transform y opacity: nunca propiedades de layout. El desplazamiento
+     y la duración salen de los tokens; nada de valores sueltos. */
+  [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, var(--dist-lg), 0);
+    transition:
+      opacity var(--dur-slow) var(--ease-smooth),
+      transform var(--dur-slow) var(--ease-smooth);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: transform, opacity;
+  }
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+  }
+
+  /* --- Movimiento ligado al scroll -----------------------------------------
+     Con animation-timeline nativo corre en el compositor: no toca el hilo
+     principal y no puede trabar el scroll. Donde no existe, simplemente no
+     pasa nada — el contenido ya está en su estado final. */
+  @supports (animation-timeline: view()) {
+    /* La foto entra levemente ampliada y se asienta. Da profundidad sin
+       que nada se mueva de lugar. */
+    .escala-scroll {
+      animation: asentar linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 45%;
+    }
+
+    /* El hero se aleja al scrollear, como en las portadas de Apple. */
+    .aleja-scroll {
+      animation: alejar linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+      transform-origin: center 35%;
+    }
+  }
+
+  @keyframes asentar {
+    from { transform: scale(1.08); }
+    to   { transform: scale(1); }
+  }
+
+  @keyframes alejar {
+    from { transform: scale(1); opacity: 1; }
+    to   { transform: scale(0.94); opacity: 0; }
+  }
+}
+
+/* ============================================================================
+   Reduced motion: manda sobre todo lo anterior.
+   Se apagan los transforms enteros y solo se permite un fundido de opacidad
+   corto, como pide la prioridad de accesibilidad del sistema de movimiento.
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: var(--dur-instant) !important;
+    animation-timeline: auto !important;
+  }
+
+  [data-reveal],
+  [data-reveal].is-visible {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .escala-scroll,
+  .aleja-scroll {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ============================================================================
+   Foco de teclado — deliberadamente FUERA de toda @layer.
+   Los estilos sin capa ganan a los de cualquier capa, así que ni una utilidad
+   de Tailwind ni un <style> con alcance de componente puede apagar el anillo
+   por accidente. Cian = foco, en toda la página, sin excepciones.
+   ============================================================================ */
+:focus-visible {
+  outline-width: 2px;
+  outline-style: solid;
+  /* Longhand a propósito: en el atajo `outline: 2px solid var(…)` el color se
+     perdía y el anillo caía a currentColor, quedando del color del texto. */
+  outline-color: var(--color-signal);
+  outline-offset: 3px;
+  border-radius: 2px;
+  /* `transition-colors` de Tailwind v4 incluye outline-color, así que el anillo
+     entraba desvanecido en ~200 ms. Un indicador de foco tiene que aparecer en
+     el acto: se rehace la lista de transición sin outline-color. */
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+}

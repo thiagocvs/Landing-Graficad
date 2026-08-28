@@ -1,0 +1,117 @@
+---
+import { servicios } from '../data/site';
+
+/**
+ * Una línea de producción por bloque, alternando lado. Cada bloque tiene una
+ * sola idea y una sola foto: es la pauta de las páginas de producto de Apple,
+ * traída a un rubro donde la foto ES el argumento.
+ *
+ * Las fotos se sirven en WebP con respaldo JPEG y `loading="lazy"`, con
+ * width/height reales para que nada salte mientras cargan.
+ */
+---
+
+<section id="servicios" data-hoja="03" class="border-t border-ink-100">
+  <div class="mx-auto max-w-[88rem] px-5 md:px-10" style="padding-block: var(--aire-seccion)">
+    <header class="text-center" data-reveal>
+      <p class="type-label text-signal">03 · Servicios</p>
+      <h2 class="type-display mt-5 text-2xl">Cinco líneas de producción</h2>
+      <p class="mx-auto mt-6 max-w-[46ch] text-lg text-ink-600">
+        De la preparación del archivo al montaje sobre estructura. Todo bajo un mismo
+        responsable.
+      </p>
+    </header>
+
+    <div class="mt-24 grid" style="gap: var(--aire-seccion)">
+      {
+        servicios.map((s, i) => (
+          <article class="grid items-center gap-10 lg:grid-cols-2 lg:gap-20">
+            <figure
+              class={`marco relative overflow-hidden ${i % 2 === 1 ? 'lg:order-2' : ''}`}
+              data-reveal
+            >
+              <picture>
+                <source srcset={`/obra/${s.foto}.webp`} type="image/webp" />
+                <img
+                  src={`/obra/${s.foto}.jpg`}
+                  alt={`Ejemplo de ${s.titulo.toLowerCase()} en gran formato`}
+                  width="1600"
+                  height="1200"
+                  loading="lazy"
+                  decoding="async"
+                  class="escala-scroll block aspect-[4/3] w-full object-cover"
+                />
+              </picture>
+            </figure>
+
+            <div data-reveal style="--reveal-delay:120ms">
+              <p class="type-label text-ink-500 tabular-nums">{s.n}</p>
+              <h3 class="type-heading mt-4 text-xl">{s.titulo}</h3>
+              <p class="mt-6 max-w-[44ch] text-lg text-ink-600">{s.texto}</p>
+
+              <dl class="mt-9 grid gap-5 border-t border-ink-200 pt-7 sm:grid-cols-2">
+                <div>
+                  <dt class="type-label text-ink-500">Sustrato</dt>
+                  <dd class="mt-1.5 text-ink-700">{s.sustrato}</dd>
+                </div>
+                <div>
+                  <dt class="type-label text-ink-500">Formato</dt>
+                  <dd class="mt-1.5 text-ink-700">{s.formato}</dd>
+                </div>
+              </dl>
+
+              <a href="#cotizacion" class="enlace-apple mt-8 text-signal">
+                Cotizar esta línea
+                <svg
+                  viewBox="0 0 24 24"
+                  class="flecha"
+                  fill="none"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M9 5l7 7-7 7" stroke-width="2.4" stroke-linecap="round" />
+                </svg>
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+
+    <p class="type-label mt-20 text-center text-ink-500">
+      Imágenes de referencia del rubro — no son obra de GrafiCAD
+    </p>
+  </div>
+</section>
+
+<style>
+  .marco {
+    border: 1px solid var(--color-ink-200);
+    background-color: var(--color-ink-050);
+  }
+  .marco img {
+    /* La foto entra apenas contenida y se enciende al acercarse. */
+    filter: saturate(0.9) brightness(0.9);
+    transition: filter var(--dur-slow) var(--ease-smooth);
+  }
+  .marco:hover img {
+    filter: none;
+  }
+
+  .enlace-apple {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    font-size: var(--text-lg);
+    transition: color var(--dur-fast) var(--ease-smooth);
+  }
+  .enlace-apple .flecha {
+    width: 0.85em;
+    height: 0.85em;
+    transition: transform var(--dur-normal) var(--ease-smooth);
+  }
+  .enlace-apple:hover .flecha {
+    transform: translateX(0.22em);
+  }
+</style>

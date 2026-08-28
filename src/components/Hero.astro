@@ -1,0 +1,192 @@
+---
+import { empresa } from '../data/site';
+import Marca from './Marca.astro';
+
+/**
+ * Portada.
+ *
+ * Compostura de Apple: una sola idea en pantalla, tipografía enorme, todo
+ * centrado y con mucho aire. Lo que antes competía acá —ficha técnica, cotas,
+ * chips— bajó a sus propias secciones.
+ *
+ * El fondo animado alcanza 0,64 de luminancia en sus trazos azules, así que el
+ * texto centrado necesita un velo radial justo donde se apoya. Las luces siguen
+ * visibles en los bordes; el centro se oscurece lo necesario y nada más.
+ */
+---
+
+<section
+  id="inicio"
+  data-hoja="01"
+  class="relative isolate flex min-h-[100svh] items-center justify-center overflow-hidden"
+>
+  <video
+    id="video-hero"
+    class="absolute inset-0 -z-30 size-full object-cover"
+    src={empresa.video}
+    poster={empresa.videoPoster}
+    autoplay
+    loop
+    muted
+    playsinline
+    preload="metadata"
+    aria-hidden="true"
+    tabindex="-1"></video>
+
+  <!-- Velo radial: oscuro donde va el texto, transparente en los bordes. -->
+  <div
+    class="absolute inset-0 -z-20 bg-[radial-gradient(70%_60%_at_50%_45%,var(--color-ink-000)_20%,color-mix(in_oklab,var(--color-ink-000)_78%,transparent)_55%,transparent_100%)]"
+    aria-hidden="true"
+  >
+  </div>
+  <div
+    class="absolute inset-0 -z-20 bg-[linear-gradient(180deg,var(--color-ink-000)_0%,transparent_18%,transparent_68%,var(--color-ink-000)_100%)]"
+    aria-hidden="true"
+  >
+  </div>
+
+  <div class="aleja-scroll relative w-full px-5 py-32 text-center md:px-10">
+    <div class="flex justify-center" data-reveal>
+      <Marca tamano="text-2xl" bajada />
+    </div>
+
+    <h1 class="type-display mt-12 text-3xl text-balance" data-reveal style="--reveal-delay:120ms">
+      Imposible no verlo
+    </h1>
+
+    <p
+      class="mx-auto mt-8 max-w-[34ch] text-xl text-balance text-ink-600"
+      data-reveal
+      style="--reveal-delay:220ms"
+    >
+      Gigantografías e impresión de gran formato. Del archivo al montaje.
+    </p>
+
+    <!-- Dos enlaces, como Apple: la acción y la prueba. -->
+    <div
+      class="mt-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-3"
+      data-reveal
+      style="--reveal-delay:320ms"
+    >
+      <a href="#cotizacion" class="enlace-apple text-signal">
+        Pedir cotización
+        <svg viewBox="0 0 24 24" class="flecha" fill="none" stroke="currentColor" aria-hidden="true">
+          <path d="M9 5l7 7-7 7" stroke-width="2.4" stroke-linecap="round"></path>
+        </svg>
+      </a>
+      <a href="#obra" class="enlace-apple text-ink-700">
+        Ver la obra
+        <svg viewBox="0 0 24 24" class="flecha" fill="none" stroke="currentColor" aria-hidden="true">
+          <path d="M9 5l7 7-7 7" stroke-width="2.4" stroke-linecap="round"></path>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- Señal de scroll y control del fondo, al pie de la portada -->
+  <div
+    class="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-4 px-5 pb-7 md:px-10"
+  >
+    <button
+      id="video-toggle"
+      type="button"
+      class="type-label inline-flex min-h-11 items-center gap-2 text-ink-500 transition-colors duration-200 hover:text-signal"
+      aria-pressed="false"
+    >
+      <svg viewBox="0 0 24 24" class="size-3.5" fill="currentColor" aria-hidden="true">
+        <path data-icono-pausa d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"></path>
+        <path data-icono-play hidden d="M8 5l11 7-11 7z"></path>
+      </svg>
+      <span data-rotulo-video>Pausar fondo</span>
+    </button>
+
+    <span class="raton" aria-hidden="true"><i></i></span>
+
+    <span class="type-label hidden text-ink-500 sm:inline">Desplazá para ver</span>
+  </div>
+</section>
+
+<style>
+  /* --- Enlace estilo Apple: texto plano y una flecha que avanza ----------- */
+  .enlace-apple {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 2.75rem;
+    font-size: var(--text-lg);
+    transition: color var(--dur-fast) var(--ease-smooth);
+  }
+  .enlace-apple .flecha {
+    width: 0.85em;
+    height: 0.85em;
+    transition: transform var(--dur-normal) var(--ease-smooth);
+  }
+  .enlace-apple:hover .flecha {
+    transform: translateX(0.22em);
+  }
+
+  /* --- Señal de desplazamiento -------------------------------------------- */
+  .raton {
+    display: block;
+    width: 1.5rem;
+    height: 2.4rem;
+    border: 1px solid var(--color-ink-400);
+    border-radius: 999px;
+    position: relative;
+  }
+  .raton i {
+    position: absolute;
+    top: 0.45rem;
+    left: 50%;
+    width: 2px;
+    height: 0.4rem;
+    margin-left: -1px;
+    border-radius: 2px;
+    background-color: var(--color-signal);
+    animation: rueda 2.4s var(--ease-smooth) infinite;
+  }
+  @keyframes rueda {
+    0% { opacity: 0; transform: translateY(0); }
+    30% { opacity: 1; }
+    70% { opacity: 0; transform: translateY(0.85rem); }
+    100% { opacity: 0; transform: translateY(0.85rem); }
+  }
+</style>
+
+<script>
+  const video = document.getElementById('video-hero') as HTMLVideoElement | null;
+  const boton = document.getElementById('video-toggle');
+
+  if (video && boton) {
+    const rotulo = boton.querySelector('[data-rotulo-video]')!;
+    const iconoPausa = boton.querySelector('[data-icono-pausa]') as SVGElement;
+    const iconoPlay = boton.querySelector('[data-icono-play]') as SVGElement;
+
+    const pintar = (pausado: boolean) => {
+      rotulo.textContent = pausado ? 'Reproducir fondo' : 'Pausar fondo';
+      boton.setAttribute('aria-pressed', String(pausado));
+      iconoPausa.toggleAttribute('hidden', pausado);
+      iconoPlay.toggleAttribute('hidden', !pausado);
+    };
+
+    // Quien pidió menos movimiento no debería recibir un fondo animado.
+    const quieto = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const aplicarPreferencia = () => {
+      if (quieto.matches) {
+        video.pause();
+        video.removeAttribute('autoplay');
+      }
+      pintar(video.paused);
+    };
+    aplicarPreferencia();
+    quieto.addEventListener('change', aplicarPreferencia);
+
+    boton.addEventListener('click', () => {
+      if (video.paused) video.play();
+      else video.pause();
+    });
+
+    video.addEventListener('play', () => pintar(false));
+    video.addEventListener('pause', () => pintar(true));
+  }
+</script>

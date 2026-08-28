@@ -1,0 +1,90 @@
+---
+import { empresa, taller } from '../data/site';
+---
+
+<section id="taller" data-hoja="04" class="textura relative border-t border-ink-100" style="--textura:.32">
+  <div
+    class="mx-auto grid max-w-[88rem] gap-x-16 gap-y-16 px-5 md:px-10 xl:grid-cols-[minmax(0,34rem)_minmax(0,1fr)]"
+    style="padding-block: var(--aire-seccion)"
+  >
+    <!-- El encabezado acompaña la lectura de la columna larga. -->
+    <div class="xl:sticky xl:top-32 xl:self-start" data-reveal>
+      <p class="type-label flex items-center gap-3 text-ink-500">
+        <!-- Marca de sección: un elemento propio, no un borde lateral. -->
+        <span class="h-4 w-0.5 shrink-0 bg-signal" aria-hidden="true"></span>
+        04 Taller
+      </p>
+
+      <h2 class="type-display mt-5 text-2xl">Por qué Graficad</h2>
+
+      <hr class="mt-8 border-ink-200" />
+
+      <p class="mt-8 text-ink-600">
+        Un solo proveedor responsable del resultado completo, del archivo a la estructura
+        montada. Precisión industrial garantizada.
+      </p>
+    </div>
+
+    <div>
+      <ol class="grid gap-x-12 gap-y-14 md:grid-cols-2">
+        {
+          taller.map((p, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 90}ms`}>
+              <p class="type-label text-ink-500 tabular-nums">{p.n}</p>
+              <h3 class="type-heading mt-3 text-xl">{p.titulo}</h3>
+              <p class="mt-4 text-ink-600">{p.texto}</p>
+
+              {/* Lista de especificación: el "+" es la viñeta del pliego técnico. */}
+              <ul class="mt-5 grid gap-2.5">
+                {p.puntos.map((punto) => (
+                  <li class="grid grid-cols-[1rem_minmax(0,1fr)] items-start gap-2 text-sm text-ink-700">
+                    <span class="type-label text-signal" aria-hidden="true">
+                      +
+                    </span>
+                    <span>{punto}</span>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+
+      <!-- Foto del taller. Reemplazá el <span> de trama por un <img> con
+           width/height explícitos y loading="lazy". -->
+      <figure
+        class="marco relative mt-16 aspect-[16/9] overflow-hidden border border-ink-200 bg-ink-100"
+        data-reveal
+      >
+        <picture>
+          <source srcset={`/obra/${empresa.fotoTaller}.webp`} type="image/webp" />
+          <img
+            src={`/obra/${empresa.fotoTaller}.jpg`}
+            alt="Impresora de gran formato con una lona en producción"
+            width="1600"
+            height="1067"
+            loading="lazy"
+            decoding="async"
+            class="escala-scroll size-full object-cover"
+          />
+        </picture>
+        <figcaption class="absolute bottom-4 left-4 flex flex-wrap gap-2">
+          <span class="chip">CMYK_v0.9</span>
+          <span class="chip chip--vivo">SYS_online</span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Mismo tratamiento que las fotos de servicios: contenida en reposo, se
+     enciende al acercarse. */
+  .marco img {
+    filter: saturate(0.9) brightness(0.9);
+    transition: filter var(--dur-slow) var(--ease-smooth);
+  }
+  .marco:hover img {
+    filter: none;
+  }
+</style>

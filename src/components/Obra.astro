@@ -1,0 +1,109 @@
+---
+import { obra } from '../data/site';
+
+/**
+ * Portafolio.
+ *
+ * La proporción de cada pieza en la grilla es la de su formato físico real:
+ * una valla es ancha, una lona de fachada es alta. Con este orden de datos las
+ * filas quedan completas, sin huecos ni solapamientos.
+ *
+ * Las fotos son de Unsplash (licencia de uso comercial libre). Son referencia
+ * del rubro, no obra de GrafiCAD; la procedencia de cada una está en site.ts.
+ */
+const celda: Record<string, string> = {
+  ancho: 'aspect-[16/9] md:aspect-auto md:col-span-2',
+  alto: 'aspect-[3/4] md:aspect-auto md:row-span-2',
+  normal: 'aspect-[4/3] md:aspect-auto',
+};
+---
+
+<section id="obra" data-hoja="05" class="border-t border-ink-100">
+  <div class="mx-auto max-w-[88rem] px-5 md:px-10" style="padding-block: var(--aire-seccion)">
+    <header class="text-center" data-reveal>
+      <p class="type-label text-signal">05 · Obra</p>
+      <h2 class="type-display mt-5 text-2xl">Piezas montadas</h2>
+      <p class="mx-auto mt-6 max-w-[50ch] text-lg text-ink-600">
+        Cada recuadro respeta la proporción real de la pieza. La grilla ya te dice de qué
+        formato hablamos antes de leer una palabra.
+      </p>
+    </header>
+
+    <div class="mt-20 grid gap-4 md:auto-rows-[15rem] md:grid-cols-3">
+      {
+        obra.map((pieza, i) => (
+          <a
+            href="#cotizacion"
+            class={`pieza group relative block overflow-hidden bg-ink-100 ${celda[pieza.span]}`}
+            data-reveal
+            style={`--reveal-delay:${i * 80}ms`}
+          >
+            <picture>
+              <source srcset={`/obra/${pieza.archivo}.webp`} type="image/webp" />
+              <img
+                src={`/obra/${pieza.archivo}.jpg`}
+                alt={`${pieza.tipo} — ${pieza.medida}`}
+                width="1600"
+                height="1067"
+                loading="lazy"
+                decoding="async"
+                class="size-full object-cover"
+              />
+            </picture>
+
+            {/* Velo que se levanta al acercarse. El pie tiene su propio degradado. */}
+            <span class="velo absolute inset-0" aria-hidden="true" />
+
+            <span class="type-label absolute top-5 left-5 text-ink-600 transition-colors duration-300 group-hover:text-signal">
+              {pieza.medida}
+            </span>
+
+            <span class="pie absolute inset-x-0 bottom-0 p-5 pt-16">
+              <span class="type-heading block text-lg text-ink-800">{pieza.cliente}</span>
+              <span class="type-label mt-1.5 block text-ink-500">{pieza.tipo}</span>
+            </span>
+          </a>
+        ))
+      }
+    </div>
+
+    <p class="type-label mt-10 text-center text-ink-500">
+      Imágenes de referencia del rubro — reemplazá por fotografías de obra propia
+    </p>
+  </div>
+</section>
+
+<style>
+  /* Desaturado en reposo, a color al acercarse. El foco de teclado recibe
+     exactamente el mismo tratamiento que el hover: nadie queda afuera. */
+  .pieza img {
+    filter: grayscale(1) brightness(0.78);
+    transform: scale(1.02);
+    transition:
+      filter var(--dur-slow) var(--ease-smooth),
+      transform var(--dur-slow) var(--ease-smooth);
+  }
+  .pieza:hover img,
+  .pieza:focus-visible img {
+    filter: none;
+    transform: scale(1.06);
+  }
+
+  .velo {
+    background-color: color-mix(in oklab, var(--color-ink-000) 30%, transparent);
+    transition: opacity var(--dur-slow) var(--ease-smooth);
+  }
+  .pieza:hover .velo,
+  .pieza:focus-visible .velo {
+    opacity: 0;
+  }
+
+  /* El pie siempre legible: degradado propio, independiente del velo. */
+  .pie {
+    background-image: linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in oklab, var(--color-ink-000) 92%, transparent)
+    );
+  }
+</style>

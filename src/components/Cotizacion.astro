@@ -1,0 +1,284 @@
+---
+import { empresa, formEndpoint, tiposProyecto } from '../data/site';
+
+const campo =
+  'min-h-12 w-full border border-ink-500 bg-ink-000 px-4 py-3 text-ink-800 transition-colors duration-200 ease-out-quart hover:border-ink-600 focus:border-signal aria-[invalid=true]:border-alert';
+
+---
+
+<section id="cotizacion" data-hoja="06" class="textura border-t border-ink-100" style="--textura:.5">
+  <div
+    class="mx-auto grid max-w-[88rem] gap-16 px-5 md:px-10 lg:grid-cols-[minmax(0,30rem)_minmax(0,1fr)] lg:gap-20"
+    style="padding-block: var(--aire-seccion)"
+  >
+    <div data-reveal>
+      <p class="type-label flex items-baseline gap-3 text-ink-500">
+        <span class="text-signal tabular-nums">06</span>
+        <span>Cotización</span>
+      </p>
+      <h2 class="type-display mt-4 text-2xl">¿Listo para ocupar la calle?</h2>
+      <p class="mt-5 text-ink-600">
+        Contanos qué necesitás y recibís una cotización con medidas, sustrato y plazo de
+        montaje. Sin costo y sin compromiso.
+      </p>
+
+      <dl class="mt-10 grid gap-5 border-t border-ink-200 pt-8">
+        <div>
+          <dt class="type-label text-ink-500">Respuesta</dt>
+          <dd class="mt-1 text-ink-700">Menos de 24 h hábiles</dd>
+        </div>
+        <div>
+          <dt class="type-label text-ink-500">Atención</dt>
+          <dd class="mt-1 text-ink-700">{empresa.horario}</dd>
+        </div>
+        <div>
+          <dt class="type-label text-ink-500">Directo</dt>
+          <dd class="mt-1">
+            <a
+              href={`tel:${empresa.telefonoHref}`}
+              class="inline-flex min-h-11 items-center text-ink-700 underline decoration-ink-400 underline-offset-4 transition-colors hover:text-signal hover:decoration-signal"
+              >{empresa.telefono}</a
+            >
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <form
+      id="form-cotizacion"
+      action={formEndpoint}
+      method="POST"
+      novalidate
+      data-email={empresa.email}
+      class="border border-ink-300 bg-ink-050 p-6 md:p-10"
+      data-reveal
+      style="--reveal-delay:120ms"
+    >
+      {/* Resumen de errores: recibe el foco tras un envío fallido y enlaza cada campo. */}
+      <div id="resumen" role="alert" tabindex="-1" hidden class="mb-8 border border-alert p-5">
+        <h3 class="type-display text-lg text-alert">Revisá estos datos</h3>
+        <ul id="resumen-lista" class="mt-2 grid gap-1 text-sm"></ul>
+      </div>
+
+      <div id="exito" role="status" hidden class="mb-8 border border-valid p-5">
+        <h3 class="type-display text-lg text-valid">Solicitud enviada</h3>
+        <p class="mt-2 text-sm text-ink-600">
+          Un asesor de {empresa.nombre} te contacta dentro de las próximas 24 h hábiles.
+        </p>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2">
+        <div>
+          <label for="empresa" class="type-label block text-ink-700">Empresa</label>
+          <input
+            id="empresa"
+            name="empresa"
+            type="text"
+            autocomplete="organization"
+            class={`mt-2 ${campo}`}
+          />
+        </div>
+
+        <div>
+          <label for="contacto-nombre" class="type-label block text-ink-700">
+            Nombre de contacto
+          </label>
+          {/* El id NO puede ser "contacto": ese lo usa el <footer>, y un id
+              duplicado hace que el enlace #contacto del menú salte al input. */}
+          <input
+            id="contacto-nombre"
+            name="contacto"
+            type="text"
+            autocomplete="name"
+            class={`mt-2 ${campo}`}
+          />
+        </div>
+
+        <div>
+          <label for="email" class="type-label block text-ink-700">
+            Correo electrónico <span class="text-signal">· obligatorio</span>
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autocomplete="email"
+            aria-describedby="email-error"
+            class={`mt-2 ${campo}`}
+          />
+          <p id="email-error" hidden class="mt-2 text-sm text-alert">
+            Necesitamos un correo válido para poder enviarte la cotización.
+          </p>
+        </div>
+
+        <div>
+          <label for="telefono" class="type-label block text-ink-700">Teléfono</label>
+          <input
+            id="telefono"
+            name="telefono"
+            type="tel"
+            autocomplete="tel"
+            class={`mt-2 ${campo}`}
+          />
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="proyecto" class="type-label block text-ink-700">
+            Tipo de proyecto <span class="text-signal">· obligatorio</span>
+          </label>
+          <select
+            id="proyecto"
+            name="proyecto"
+            required
+            aria-describedby="proyecto-error"
+            class={`select-flecha mt-2 pr-12 ${campo}`}
+          >
+            <option value="">Elegí una opción</option>
+            {tiposProyecto.map((t) => <option value={t.value}>{t.label}</option>)}
+          </select>
+          <p id="proyecto-error" hidden class="mt-2 text-sm text-alert">
+            Indicá qué tipo de pieza necesitás.
+          </p>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="mensaje" class="type-label block text-ink-700">
+            Mensaje <span class="text-ink-500">· opcional</span>
+          </label>
+          <textarea
+            id="mensaje"
+            name="mensaje"
+            rows="4"
+            placeholder="Medidas aproximadas, ubicación, fecha estimada de montaje."
+            class={`mt-2 resize-y ${campo}`}></textarea>
+        </div>
+      </div>
+
+      {/* Trampa de spam de Formspree: invisible para personas, no para bots. */}
+      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="hidden" />
+
+      <button
+        id="enviar"
+        type="submit"
+        class="type-label mt-8 inline-flex min-h-12 w-full items-center justify-center bg-signal px-8 text-signal-ink transition-colors duration-200 ease-out-quart hover:bg-signal-lit active:bg-signal-dim disabled:cursor-not-allowed disabled:bg-ink-300 disabled:text-ink-600 sm:w-auto"
+      >
+        <span data-rotulo>Enviar solicitud</span>
+      </button>
+
+      <p class="mt-4 text-sm text-ink-500">
+        Usamos tus datos únicamente para responder esta consulta.
+      </p>
+    </form>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('form-cotizacion') as HTMLFormElement;
+  const resumen = document.getElementById('resumen')!;
+  const lista = document.getElementById('resumen-lista')!;
+  const exito = document.getElementById('exito')!;
+  const boton = document.getElementById('enviar') as HTMLButtonElement;
+  const rotulo = boton.querySelector('[data-rotulo]')!;
+
+  type Regla = { id: string; etiqueta: string; valida: (v: string) => boolean };
+
+  const reglas: Regla[] = [
+    {
+      id: 'email',
+      etiqueta: 'Correo electrónico',
+      valida: (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()),
+    },
+    {
+      id: 'proyecto',
+      etiqueta: 'Tipo de proyecto',
+      valida: (v) => v !== '',
+    },
+  ];
+
+  function revisar(regla: Regla, mostrar: boolean): boolean {
+    const input = document.getElementById(regla.id) as HTMLInputElement | HTMLSelectElement;
+    const error = document.getElementById(regla.id + '-error')!;
+    const valido = regla.valida(input.value);
+    if (mostrar) {
+      input.setAttribute('aria-invalid', String(!valido));
+      error.hidden = valido;
+    }
+    return valido;
+  }
+
+  // Validación al perder el foco, nunca en cada pulsación.
+  for (const regla of reglas) {
+    const input = document.getElementById(regla.id)!;
+    input.addEventListener('blur', () => revisar(regla, true));
+    // Ya marcado el error, sí corregimos en vivo: premia la corrección en curso.
+    input.addEventListener('input', () => {
+      if (input.getAttribute('aria-invalid') === 'true') revisar(regla, true);
+    });
+  }
+
+  function mostrarResumen(nodos: Node[]) {
+    lista.replaceChildren(...nodos);
+    resumen.hidden = false;
+    resumen.focus();
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fallidos = reglas.filter((r) => !revisar(r, true));
+
+    if (fallidos.length > 0) {
+      exito.hidden = true;
+      mostrarResumen(
+        fallidos.map((r) => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = '#' + r.id;
+          a.textContent = r.etiqueta;
+          a.className = 'text-alert underline underline-offset-4';
+          a.addEventListener('click', (ev) => {
+            ev.preventDefault();
+            document.getElementById(r.id)!.focus();
+          });
+          li.append(a);
+          return li;
+        }),
+      );
+      return;
+    }
+
+    resumen.hidden = true;
+    boton.disabled = true;
+    rotulo.textContent = 'Enviando…';
+
+    try {
+      const respuesta = await fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { Accept: 'application/json' },
+      });
+      if (!respuesta.ok) throw new Error(String(respuesta.status));
+
+      form.reset();
+      form
+        .querySelectorAll('[aria-invalid]')
+        .forEach((el) => el.removeAttribute('aria-invalid'));
+      form.querySelectorAll<HTMLElement>('[id$="-error"]').forEach((el) => (el.hidden = true));
+      exito.hidden = false;
+      exito.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    } catch {
+      // El fallo de red se informa donde el lector ya está mirando, con una salida.
+      const li = document.createElement('li');
+      li.className = 'text-ink-600';
+      li.textContent =
+        'No pudimos enviar la solicitud. Probá de nuevo o escribinos a ' +
+        (form.dataset.email ?? '') +
+        '.';
+      exito.hidden = true;
+      mostrarResumen([li]);
+    } finally {
+      boton.disabled = false;
+      rotulo.textContent = 'Enviar solicitud';
+    }
+  });
+</script>
